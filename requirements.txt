@@ -1,0 +1,14 @@
+streamlit
+fastapi
+langchain
+langgraph
+groq
+seaborn
+matplotlib
+pandas
+scikit-learn
+openpyxl
+ipykernel
+dotenv
+langchain_community
+langchain_groq
