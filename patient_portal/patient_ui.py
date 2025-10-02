@@ -22,7 +22,7 @@ REMINDERS_FILE = "data/reminders.csv"
 os.makedirs(PATIENT_DATA_DIR, exist_ok=True)
 os.makedirs("data", exist_ok=True)
 
-# Modern CSS for patient portal with better readability
+
 st.markdown("""
 <style>
     .patient-header {
@@ -334,7 +334,7 @@ def get_reminders_for_user(username):
 
 def patient_page():
     
-    # Add back to role selection button
+    
     col1, col2 = st.columns([4, 1])
     with col2:
         if st.button("← Back to Main", key="back_to_role", use_container_width=True):
@@ -348,7 +348,7 @@ def patient_page():
         st.session_state.logged_in = False
         
     if not st.session_state.logged_in:
-        # Centered login page
+      
         st.markdown('<div class="centered-container">', unsafe_allow_html=True)
         st.markdown("""
         <div class="login-container">
@@ -410,11 +410,10 @@ def patient_page():
         st.markdown("</div></div>", unsafe_allow_html=True)
         return
 
-    # User is logged in - show dashboard
+   
     username = st.session_state.username
     
-    # Beautiful header with user info
-# Beautiful header with user info
+
     st.markdown(f"""
     <div class="patient-header">
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -550,7 +549,7 @@ def patient_page():
                     except Exception as e:
                         st.info(f"ℹ️ Heart disease prediction not available: {e}")
                 
-                # Show key metrics visualization - BAR GRAPH ADDED HERE
+                # Show key metrics visualization 
                 st.markdown("### 📈 Key Health Metrics")
                 numeric_cols = ["Glucose", "BMI", "Cholesterol", "BloodPressure", "MaxHR"]
                 available_cols = [c for c in numeric_cols if c in all_reports.columns]
@@ -712,7 +711,7 @@ def patient_page():
         with st.spinner("🔄 Generating personalized insights..."):
             try:
                 insights = generate_patient_insights(all_reports)
-                # Create a styled container and render markdown inside it
+                
                 with st.container():
                     st.markdown(
                         f"""
@@ -779,7 +778,7 @@ def patient_page():
         st.markdown("### 📋 Your Upcoming Reminders")
         rems = get_reminders_for_user(username)
         if not rems.empty:
-            # Filter future reminders
+
             today = datetime.now().strftime("%Y-%m-%d")
             future_rems = rems[rems["reminder_date"] >= today]
             

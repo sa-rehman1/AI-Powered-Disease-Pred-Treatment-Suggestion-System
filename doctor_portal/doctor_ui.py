@@ -16,7 +16,7 @@ from patient_portal.patient_ui import hash_password, PATIENT_DATA_DIR, REMINDERS
 from dotenv import load_dotenv
 load_dotenv()
 
-# Modern CSS for doctor portal with better readability
+
 st.markdown("""
 <style>
     .doctor-header {
@@ -192,7 +192,7 @@ def get_reminders_for_patient(patient_name):
 def categorize_risk(prob):
     """Categorize risk level - defaults to Low if no prediction"""
     if pd.isna(prob):
-        return "Low"  # Default to Low risk if no prediction available
+        return "Low"  
     if prob >= 0.7:
         return "High"
     elif prob >= 0.3:
@@ -204,7 +204,7 @@ def categorize_risk(prob):
 
 def doctor_page():
     
-    # Add back to role selection button
+  
     col1, col2 = st.columns([4, 1])
     with col2:
         if st.button("← Back to Main", key="back_to_role_doctor", use_container_width=True):
@@ -218,7 +218,7 @@ def doctor_page():
         st.session_state.doctor_logged_in = False
 
     if not st.session_state.doctor_logged_in:
-        # Centered login page
+        
         st.markdown('<div class="centered-container">', unsafe_allow_html=True)
         st.markdown("""
         <div class="login-container">
@@ -281,7 +281,7 @@ def doctor_page():
         return
 
     # Doctor is logged in - show dashboard
-    # Welcome header with logout
+    
     st.markdown(f"""
     <div class="doctor-header">
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -338,7 +338,7 @@ def doctor_page():
                 continue
             latest_row = df.sort_values("timestamp", ascending=False).head(1).squeeze()
 
-            # Get predictions with try-except
+            # Get predictions 
             try:
                 diabetes_prob = predict_diabetes(latest_row.to_frame().T)[1] if all(col in df.columns for col in ["Pregnancies","Glucose","BloodPressure","SkinThickness","Insulin","BMI","DiabetesPedigreeFunction","Age"]) else np.nan
             except Exception:
@@ -349,7 +349,7 @@ def doctor_page():
             except Exception:
                 heart_prob = np.nan
 
-            # Categorize risks (defaults to Low if no prediction)
+            # Categorize risks 
             diabetes_risk = categorize_risk(diabetes_prob)
             heart_risk = categorize_risk(heart_prob)
             
@@ -475,7 +475,7 @@ def doctor_page():
                 with st.spinner("🔄 Generating AI insights..."):
                     try:
                         insights = generate_patient_insights(df_sorted)
-                        # Process markdown properly instead of using unsafe HTML
+                        
                         st.markdown(insights)
                     except Exception as e:
                         st.info(f"ℹ️ AI insights temporarily unavailable: {e}")
@@ -486,8 +486,7 @@ def doctor_page():
                 else:
                     st.info("📝 No previous reports available for this patient.")
 
-                # Rest of the doctor dashboard code remains the same...
-                # [YOUR EXISTING DOCTOR DASHBOARD CODE FOR PATIENT DETAILS]
+             
 
                 # Trend analysis
                 st.markdown("### 📈 Health Metrics Trend Analysis")

@@ -9,7 +9,7 @@ st.set_page_config(
     page_icon="🏥"
 )
 
-# Modern CSS with better contrast and readability
+
 st.markdown("""
 <style>
     .stApp {
@@ -179,7 +179,7 @@ def show_role_selection():
     st.markdown("### 👥 Select Your Role")
     st.markdown("Choose how you want to access the system:")
     
-    # Clear radio button selection with better visibility
+  
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         role = st.radio(
@@ -189,7 +189,7 @@ def show_role_selection():
             key="role_selector"
         )
     
-    # Role Description Cards
+   
     col_left, col_right = st.columns(2)
     
     with col_left:
@@ -218,7 +218,7 @@ def show_role_selection():
     
     st.markdown("</div>", unsafe_allow_html=True)
     
-    # Continue Button
+
     if st.button(f"🚀 Continue as {'Patient' if role == '👤 Patient' else 'Doctor'}", 
                  use_container_width=True, type="primary"):
         st.session_state.selected_role = role
