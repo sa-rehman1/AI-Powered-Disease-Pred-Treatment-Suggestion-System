@@ -1,0 +1,2 @@
+Age,Sex,ChestPainType,RestingBP,Cholesterol,FastingBS,RestingECG,MaxHR,ExerciseAngina,Oldpeak,ST_Slope,timestamp
+40,M,ATA,180,203,0,ST,130,N,1,Up,2025-10-01 20:47:56

@@ -22,6 +22,144 @@ REMINDERS_FILE = "data/reminders.csv"
 os.makedirs(PATIENT_DATA_DIR, exist_ok=True)
 os.makedirs("data", exist_ok=True)
 
+# Modern CSS for patient portal with better readability
+st.markdown("""
+<style>
+    .patient-header {
+        background: linear-gradient(135deg, #2E8B57 0%, #3CB371 100%);
+        color: white;
+        padding: 35px;
+        border-radius: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 15px 0;
+        border-left: 6px solid #2E8B57;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    .risk-low {
+        border-left-color: #28a745;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fff9 100%);
+    }
+    
+    .risk-moderate {
+        border-left-color: #ffc107;
+        background: linear-gradient(135deg, #ffffff 0%, #fffbf0 100%);
+    }
+    
+    .risk-high {
+        border-left-color: #dc3545;
+        background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+    }
+    
+    .upload-area {
+        border: 3px dashed #2E8B57;
+        border-radius: 20px;
+        padding: 50px;
+        text-align: center;
+        background: #f8fff9;
+        margin: 25px 0;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+        background: #f0fff4;
+        border-color: #267349;
+    }
+    
+    .insight-box {
+        background: white;
+        color: #2d3748;
+        padding: 30px;
+        border-radius: 15px;
+        margin: 20px 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9ecef;
+        line-height: 1.6;
+        font-size: 1.05rem;
+    }
+    
+    .insight-box h1, .insight-box h2, .insight-box h3, .insight-box h4 {
+        color: #2E8B57;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 8px;
+    }
+    
+    .insight-box h3:first-child, .insight-box h4:first-child {
+        margin-top: 0;
+    }
+    
+    .reminder-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 12px 0;
+        border-left: 4px solid #2E8B57;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e9ecef;
+    }
+    
+    .login-container {
+        background: white;
+        border-radius: 20px;
+        padding: 45px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+        margin: 0 auto;
+        max-width: 600px;
+    }
+    
+    .back-button {
+        background: #6c757d !important;
+        color: white !important;
+        border: none !important;
+    }
+    
+    .back-button:hover {
+        background: #5a6268 !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    /* Improve radio button visibility */
+    .stRadio > div {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stRadio > div > label {
+        font-size: 1.1rem !important;
+        font-weight: 500 !important;
+        color: #2d3748 !important;
+    }
+    
+    /* Center the login page */
+    .centered-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # ---------- Helper Functions ----------
 
 def hash_password(password):
@@ -196,64 +334,137 @@ def get_reminders_for_user(username):
 
 def patient_page():
     
+    # Add back to role selection button
+    col1, col2 = st.columns([4, 1])
+    with col2:
+        if st.button("← Back to Main", key="back_to_role", use_container_width=True):
+            st.session_state.current_page = "role_selection"
+            st.session_state.logged_in = False
+            st.session_state.username = None
+            st.rerun()
+    
     # --- Login / Signup ---
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
+        
     if not st.session_state.logged_in:
-        tab1, tab2 = st.tabs(["🔐 Login", "📝 Signup"])
+        # Centered login page
+        st.markdown('<div class="centered-container">', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="login-container">
+            <h2 style="color: #2E8B57; margin-bottom: 10px; text-align: center;">👤 Patient Portal</h2>
+            <p style="color: #718096; text-align: center; margin-bottom: 30px;">Access your health insights and predictions</p>
+        """, unsafe_allow_html=True)
+        
+        tab1, tab2 = st.tabs(["🔐 **Login**", "📝 **Signup**"])
+        
         with tab1:
-            st.markdown('<h3 style="color: #1b5e20; text-align: center;">Patient Login</h3>', unsafe_allow_html=True)
-            username = st.text_input("Username", key="login_user", placeholder="Enter your username")
-            password = st.text_input("Password", type="password", key="login_pw", placeholder="Enter your password")
-            if st.button("Login", key="patient_login_btn"):
-                success, msg = login(username, password)
-                if success:
-                    st.success(msg)
-                    st.session_state.logged_in = True
-                    st.session_state.username = username
+            st.markdown("### Welcome Back")
+            st.markdown("Sign in to access your health dashboard")
+            
+            username = st.text_input("👤 Username", placeholder="Enter your username", key="login_user")
+            password = st.text_input("🔒 Password", type="password", placeholder="Enter your password", key="login_pw")
+            
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button("🚀 Login to Dashboard", key="patient_login_btn", use_container_width=True):
+                    if username and password:
+                        success, msg = login(username, password)
+                        if success:
+                            st.success(msg)
+                            st.session_state.logged_in = True
+                            st.session_state.username = username
+                            st.rerun()
+                        else:
+                            st.error(msg)
+                    else:
+                        st.error("Please enter both username and password")
+            
+            with col2:
+                if st.button("🔄 Clear", key="clear_login", use_container_width=True):
                     st.rerun()
-                else:
-                    st.error(msg)
+        
         with tab2:
-            st.markdown('<h3 style="color: #1b5e20; text-align: center;">Create Account</h3>', unsafe_allow_html=True)
-            username = st.text_input("New Username", key="signup_user", placeholder="Choose a username")
-            password = st.text_input("New Password", type="password", key="signup_pw", placeholder="Choose a password")
-            if st.button("Signup", key="patient_signup_btn"):
-                success, msg = signup(username, password)
-                if success:
-                    st.success(msg)
-                else:
-                    st.error(msg)
+            st.markdown("### Create Account")
+            st.markdown("Join our healthcare platform to start monitoring your health")
+            
+            username = st.text_input("👤 Choose Username", placeholder="Pick a username", key="signup_user")
+            password = st.text_input("🔒 Create Password", type="password", placeholder="Create a password", key="signup_pw")
+            
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button("🌟 Create Account", key="patient_signup_btn", use_container_width=True):
+                    if username and password:
+                        success, msg = signup(username, password)
+                        if success:
+                            st.success(msg)
+                        else:
+                            st.error(msg)
+                    else:
+                        st.error("Please enter both username and password")
+            
+            with col2:
+                if st.button("🔄 Clear", key="clear_signup", use_container_width=True):
+                    st.rerun()
+        
+        st.markdown("</div></div>", unsafe_allow_html=True)
         return
 
+    # User is logged in - show dashboard
     username = st.session_state.username
     
-    # Welcome header with logout
-    col1, col2 = st.columns([5, 1])
-    with col1:
-        st.markdown(f'<h2 style="color: #1b5e20;">👤 Welcome, {username}</h2>', unsafe_allow_html=True)
+    # Beautiful header with user info
+# Beautiful header with user info
+    st.markdown(f"""
+    <div class="patient-header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="margin: 0; color: #1b5e20; font-size: 2.2rem;">👤 Welcome, {username}</h1>
+                <p style="margin: 0; color: #2e7d32; font-size: 1.2rem;">Your Personal Health Dashboard</p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Navigation and logout
+    col1, col2, col3 = st.columns([4, 1, 1])
     with col2:
-        if st.button("Logout", key="patient_logout"):
+        if st.button("🔄 Refresh", key="refresh_dashboard", use_container_width=True):
+            st.rerun()
+    with col3:
+        if st.button("🚪 Logout", key="patient_logout", use_container_width=True):
+            st.session_state.current_page = "role_selection"
             st.session_state.logged_in = False
             st.session_state.username = None
             st.rerun()
     
     st.markdown("---")
     
-    # Navigation menu
+    # Navigation menu with clear radio buttons
+    st.markdown("### 📍 Navigation")
     menu_option = st.radio(
-        "Navigation:",
+        "Choose a section:",
         ["📤 Upload Report", "📊 View Reports", "🤖 AI Insights", "⏰ Reminders"],
-        horizontal=True
+        horizontal=True,
+        key="patient_navigation"
     )
     
     st.markdown("---")
     
     # OPTION 1: Upload Medical Report
     if menu_option == "📤 Upload Report":
-        st.subheader("📤 Upload Medical Report")
+        st.markdown("## 📤 Upload Medical Report")
+        st.markdown("Upload your medical test results to get AI-powered health insights and risk predictions.")
         
-        uploaded = st.file_uploader("Choose your medical report file", type=["csv", "xlsx"])
+        st.markdown("""
+        <div class="upload-area">
+            <h3 style="color: #2E8B57; margin-bottom: 15px;">📁 Upload Your Medical Report</h3>
+            <p style="color: #718096; font-size: 1.1rem; margin-bottom: 5px;">Supported formats: CSV, Excel</p>
+            <p style="color: #a0aec0; font-size: 1rem;">Drag and drop your file here or click to browse</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        uploaded = st.file_uploader("Choose your medical report file", type=["csv", "xlsx"], label_visibility="collapsed", key="file_uploader")
         if uploaded:
             try:
                 if uploaded.name.endswith((".xlsx", ".xls")):
@@ -261,7 +472,7 @@ def patient_page():
                 else:
                     df = pd.read_csv(uploaded)
             except Exception as e:
-                st.error(f"Failed to parse uploaded file: {e}")
+                st.error(f"❌ Failed to parse uploaded file: {e}")
                 return
 
             save_patient_report(username, df)
@@ -280,39 +491,66 @@ def patient_page():
                 
                 latest_row = all_reports.head(1).squeeze()
                 
-                st.markdown("### 🔬 ML Predictions for Uploaded Report")
+                st.markdown("## 🔬 Health Risk Assessment")
                 
                 # Diabetes prediction
+                
                 if all(col in all_reports.columns for col in ["Pregnancies","Glucose","BloodPressure","SkinThickness","Insulin","BMI","DiabetesPedigreeFunction","Age"]):
                     try:
                         label, prob = predict_diabetes(latest_row.to_frame().T)
-                        if prob < 0.3:
-                            st.success(f"🟢 **Diabetes Risk: LOW** (Probability: {prob:.2f})")
-                        elif prob < 0.7:
-                            st.warning(f"🟡 **Diabetes Risk: MODERATE** (Probability: {prob:.2f})")
-                        else:
-                            st.error(f"🔴 **Diabetes Risk: HIGH** (Probability: {prob:.2f})")
+                        risk_class = "risk-high" if prob >= 0.7 else "risk-moderate" if prob >= 0.3 else "risk-low"
+                        risk_text = "HIGH" if prob >= 0.7 else "MODERATE" if prob >= 0.3 else "LOW"
+                        risk_color = "🔴" if prob >= 0.7 else "🟡" if prob >= 0.3 else "🟢"
+                        risk_bg_color = "#ff4444" if prob >= 0.7 else "#ffaa00" if prob >= 0.3 else "#44ff44"
+                        
+                        st.markdown(f"""
+                        <div class="metric-card {risk_class}">
+                            <h3 style="color: #2d3748; margin-bottom: 20px; text-align: center;">🩺 Diabetes Risk Assessment</h3>
+                            <div style="text-align: center; padding: 20px; background: {risk_bg_color}20; border-radius: 15px; border: 2px solid {risk_bg_color};">
+                                <p style="font-size: 2rem; margin: 10px 0; font-weight: 800; color: {risk_bg_color};">
+                                    {risk_color} {risk_text} RISK
+                                </p>
+                                <p style="font-size: 1.5rem; margin: 5px 0; font-weight: 700; color: #2d3748;">
+                                    Probability: {prob:.2f}
+                                </p>
+                                <p style="font-size: 1rem; margin: 10px 0 0 0; color: #718096; font-weight: 500;">
+                                    {'⚠️ Immediate medical attention recommended' if prob >= 0.7 else '🔄 Regular monitoring advised' if prob >= 0.3 else '✅ Low risk - maintain healthy lifestyle'}
+                                </p>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
                     except Exception as e:
-                        st.info(f"Diabetes prediction not available: {e}")
-                else:
-                    st.info("Diabetes prediction requires: Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age")
+                        st.info(f"ℹ️ Diabetes prediction not available: {e}")
                 
                 # Heart disease prediction
                 if all(col in all_reports.columns for col in ["Age","Sex","ChestPainType","RestingBP","Cholesterol","FastingBS","RestingECG","MaxHR","ExerciseAngina","Oldpeak","ST_Slope"]):
                     try:
                         label, prob = predict_heart(latest_row.to_frame().T)
-                        if prob < 0.3:
-                            st.success(f"🟢 **Heart Disease Risk: LOW** (Probability: {prob:.2f})")
-                        elif prob < 0.7:
-                            st.warning(f"🟡 **Heart Disease Risk: MODERATE** (Probability: {prob:.2f})")
-                        else:
-                            st.error(f"🔴 **Heart Disease Risk: HIGH** (Probability: {prob:.2f})")
+                        risk_class = "risk-high" if prob >= 0.7 else "risk-moderate" if prob >= 0.3 else "risk-low"
+                        risk_text = "HIGH" if prob >= 0.7 else "MODERATE" if prob >= 0.3 else "LOW"
+                        risk_color = "🔴" if prob >= 0.7 else "🟡" if prob >= 0.3 else "🟢"
+                        risk_bg_color = "#ff4444" if prob >= 0.7 else "#ffaa00" if prob >= 0.3 else "#44ff44"
+                        
+                        st.markdown(f"""
+                        <div class="metric-card {risk_class}">
+                            <h3 style="color: #2d3748; margin-bottom: 20px; text-align: center;">❤️ Heart Disease Risk Assessment</h3>
+                            <div style="text-align: center; padding: 20px; background: {risk_bg_color}20; border-radius: 15px; border: 2px solid {risk_bg_color};">
+                                <p style="font-size: 2rem; margin: 10px 0; font-weight: 800; color: {risk_bg_color};">
+                                    {risk_color} {risk_text} RISK
+                                </p>
+                                <p style="font-size: 1.5rem; margin: 5px 0; font-weight: 700; color: #2d3748;">
+                                    Probability: {prob:.2f}
+                                </p>
+                                <p style="font-size: 1rem; margin: 10px 0 0 0; color: #718096; font-weight: 500;">
+                                    {'⚠️ Immediate medical attention recommended' if prob >= 0.7 else '🔄 Regular monitoring advised' if prob >= 0.3 else '✅ Low risk - maintain healthy lifestyle'}
+                                </p>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
                     except Exception as e:
-                        st.info(f"Heart disease prediction not available: {e}")
-                else:
-                    st.info("Heart disease prediction requires: Age, Sex, ChestPainType, RestingBP, Cholesterol, FastingBS, RestingECG, MaxHR, ExerciseAngina, Oldpeak, ST_Slope")
+                        st.info(f"ℹ️ Heart disease prediction not available: {e}")
                 
-                # Show key metrics visualization
+                # Show key metrics visualization - BAR GRAPH ADDED HERE
                 st.markdown("### 📈 Key Health Metrics")
                 numeric_cols = ["Glucose", "BMI", "Cholesterol", "BloodPressure", "MaxHR"]
                 available_cols = [c for c in numeric_cols if c in all_reports.columns]
@@ -328,28 +566,37 @@ def patient_page():
                         labels.append(c)
                         values.append(val)
 
-                    fig, ax = plt.subplots(figsize=(10, 4))
-                    colors = ['#43a047', '#388e3c', '#2e7d32', '#1b5e20', '#66bb6a']
-                    sns.barplot(x=labels, y=values, palette=colors, ax=ax)
-                    ax.set_facecolor('#f1f8f4')
-                    fig.patch.set_facecolor('#f1f8f4')
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    colors = ['#2E8B57', '#3CB371', '#48BB78', '#68D391', '#9AE6B4']
+                    bars = ax.bar(labels, values, color=colors, alpha=0.8)
+                    ax.set_facecolor('#f8fff9')
+                    fig.patch.set_facecolor('#f8fff9')
+                    
+                    # Add value labels on bars
                     for i, v in enumerate(values):
                         if pd.notna(v):
-                            ax.text(i, v + max(0.1, 0.01 * abs(v)), f"{v:.1f}", ha='center', fontweight='bold')
+                            ax.text(i, v + max(0.1, 0.01 * abs(v)), f"{v:.1f}", 
+                                ha='center', fontweight='bold', fontsize=11)
+                    
                     numeric_vals = [v for v in values if not pd.isna(v)]
                     if numeric_vals:
                         ax.set_ylim(0, max(numeric_vals) * 1.3)
-                    ax.set_xlabel("Health Metrics", fontsize=11, fontweight='bold', color='#1b5e20')
-                    ax.set_ylabel("Values", fontsize=11, fontweight='bold', color='#1b5e20')
+                    
+                    ax.set_xlabel("Health Metrics", fontsize=12, fontweight='bold', color='#2d3748')
+                    ax.set_ylabel("Values", fontsize=12, fontweight='bold', color='#2d3748')
+                    ax.tick_params(axis='x', rotation=45)
+                    plt.tight_layout()
                     st.pyplot(fig)
-    
+                
+
     # OPTION 2: View Reports & Health Trends
     elif menu_option == "📊 View Reports":
-        st.subheader("📊 View Reports & Health Trends")
+        st.markdown("## 📊 View Reports & Health Trends")
+        st.markdown("Monitor your health data over time and track your risk factors.")
         
         patient_file = os.path.join(PATIENT_DATA_DIR, f"{username}_data.csv")
         if not os.path.exists(patient_file):
-            st.info("No reports found yet. Upload a report to get started.")
+            st.info("📝 No reports found yet. Upload a report to get started.")
             return
 
         all_reports = pd.read_csv(patient_file)
@@ -363,7 +610,7 @@ def patient_page():
         else:
             all_reports = all_reports.sort_values(all_reports.columns[0], ascending=False)
 
-        st.markdown("### 📋 Last 5 Reports")
+        st.markdown("### 📋 Recent Medical Reports")
         st.dataframe(get_last_reports(username, n=5), use_container_width=True)
 
         # Compute predictions
@@ -391,13 +638,13 @@ def patient_page():
         else:
             all_reports["heart_prob"] = pd.to_numeric(all_reports["heart_prob"], errors="coerce")
 
-        st.markdown("### 📉 Health Risk Trends")
+        st.markdown("### 📉 Health Risk Trends Over Time")
         try:
             idx = "timestamp_parsed" if "timestamp_parsed" in all_reports.columns else "timestamp"
             chart_df = all_reports[[idx, "diabetes_prob", "heart_prob"]].set_index(idx)
             st.line_chart(chart_df)
         except Exception:
-            st.info("Not enough data to plot risk trends.")
+            st.info("📊 Not enough data to plot risk trends yet. Upload more reports to see trends.")
 
         # Risk Level Indicators
         latest = all_reports.iloc[0]
@@ -405,15 +652,15 @@ def patient_page():
 
         def safe_risk_display(prob, label):
             if pd.isna(prob):
-                st.info(f"No prediction available for {label}")
+                st.info(f"ℹ️ No prediction available for {label}")
                 return
 
             if prob < 0.3:
-                st.success(f"🟢 {label} Risk: **LOW** ({prob:.2f})")
+                st.success(f"🟢 **{label} Risk: LOW** (Probability: {prob:.2f})")
             elif prob < 0.7:
-                st.warning(f"🟡 {label} Risk: **MODERATE** ({prob:.2f})")
+                st.warning(f"🟡 **{label} Risk: MODERATE** (Probability: {prob:.2f})")
             else:
-                st.error(f"🔴 {label} Risk: **HIGH** ({prob:.2f})")
+                st.error(f"🔴 **{label} Risk: HIGH** (Probability: {prob:.2f})")
 
         col1, col2 = st.columns(2)
         with col1:
@@ -437,19 +684,20 @@ def patient_page():
                 except Exception:
                     val = np.nan
                 if rule_fn(val):
-                    st.error(f"⚠️ {col}: {val} — {msg}")
+                    st.error(f"⚠️ **{col}: {val}** — {msg}")
                     critical_seen = True
 
         if not critical_seen:
-            st.success("✅ No critical alerts detected")
+            st.success("✅ No critical alerts detected in your latest report")
     
     # OPTION 3: AI Insights & Health Summary
     elif menu_option == "🤖 AI Insights":
-        st.subheader("🤖 AI Insights & Health Summary")
+        st.markdown("## 🤖 AI Insights & Health Summary")
+        st.markdown("Get personalized health insights and recommendations powered by artificial intelligence.")
         
         patient_file = os.path.join(PATIENT_DATA_DIR, f"{username}_data.csv")
         if not os.path.exists(patient_file):
-            st.info("No reports found yet. Upload a report to get started.")
+            st.info("📝 No reports found yet. Upload a report to get AI insights.")
             return
 
         all_reports = pd.read_csv(patient_file)
@@ -460,15 +708,35 @@ def patient_page():
             except Exception:
                 all_reports = all_reports.sort_values("timestamp", ascending=False)
 
-        st.markdown("### 💡 AI-Generated Insights")
-        try:
-            insights = generate_patient_insights(all_reports)
-            st.markdown(insights)
-        except Exception as e:
-            st.error(f"Failed to generate AI insights: {e}")
-            insights = "AI insights unavailable."
+        st.markdown("### 💡 AI-Generated Health Insights")
+        with st.spinner("🔄 Generating personalized insights..."):
+            try:
+                insights = generate_patient_insights(all_reports)
+                # Create a styled container and render markdown inside it
+                with st.container():
+                    st.markdown(
+                        f"""
+                        <div style='
+                            background: white;
+                            color: #2d3748;
+                            padding: 30px;
+                            border-radius: 15px;
+                            margin: 20px 0;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                            border: 1px solid #e9ecef;
+                            line-height: 1.6;
+                            font-size: 1.05rem;
+                        '>
+                        """, 
+                        unsafe_allow_html=True
+                    )
+                    st.markdown(insights)
+                    st.markdown("</div>", unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"❌ Failed to generate AI insights: {e}")
 
         st.markdown("### 📥 Download Health Summary")
+        st.markdown("Download a comprehensive summary of your health report including AI insights and predictions.")
         
         latest_row = all_reports.head(1).squeeze()
         latest_for_summary = latest_row.to_dict()
@@ -478,27 +746,56 @@ def patient_page():
         }
         summary_bytes, mime, filename = create_health_summary_bytes(username, latest_for_summary, latest_preds, insights)
 
-        st.download_button("📄 Download Summary", data=summary_bytes, file_name=filename, mime=mime, use_container_width=True)
+        st.download_button(
+            "📄 Download Health Summary Report", 
+            data=summary_bytes, 
+            file_name=filename, 
+            mime=mime, 
+            use_container_width=True,
+            help="Download a comprehensive PDF report of your health data and insights"
+        )
     
     # OPTION 4: Manage Reminders
     elif menu_option == "⏰ Reminders":
-        st.subheader("⏰ Manage Reminders")
+        st.markdown("## ⏰ Manage Health Reminders")
+        st.markdown("Set reminders for medication, doctor appointments, and health check-ups.")
         
         st.markdown("### ➕ Set New Reminder")
         col_date, col_note = st.columns([1, 2])
         with col_date:
-            remind_date = st.date_input("Date")
+            remind_date = st.date_input("Reminder Date", help="Select the date for your reminder")
         with col_note:
-            remind_note = st.text_input("Note (optional)", placeholder="e.g., Doctor appointment")
+            remind_note = st.text_input("Reminder Note", placeholder="e.g., Doctor appointment, Medication refill, Lab test", 
+                                      help="Add a note to remember what this reminder is for")
         
-        if st.button("Save Reminder", use_container_width=True):
-            save_reminder(username, remind_date.strftime("%Y-%m-%d"), remind_note)
-            st.success("✅ Reminder saved!")
-            st.rerun()
+        if st.button("💾 Save Reminder", use_container_width=True):
+            if remind_note.strip():
+                save_reminder(username, remind_date.strftime("%Y-%m-%d"), remind_note)
+                st.success("✅ Reminder saved successfully!")
+                st.rerun()
+            else:
+                st.warning("⚠️ Please add a note for your reminder")
 
-        st.markdown("### 📋 Your Reminders")
+        st.markdown("### 📋 Your Upcoming Reminders")
         rems = get_reminders_for_user(username)
         if not rems.empty:
-            st.dataframe(rems, use_container_width=True)
+            # Filter future reminders
+            today = datetime.now().strftime("%Y-%m-%d")
+            future_rems = rems[rems["reminder_date"] >= today]
+            
+            if not future_rems.empty:
+                for _, reminder in future_rems.iterrows():
+                    st.markdown(f"""
+                    <div class="reminder-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #2E8B57; font-size: 1.1rem;">📅 {reminder['reminder_date']}</strong>
+                                <p style="margin: 5px 0 0 0; color: #4a5568;">{reminder['note']}</p>
+                            </div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("📝 No upcoming reminders. Add a new reminder above.")
         else:
-            st.info("No reminders set yet.")
+            st.info("📝 No reminders set yet. Add your first reminder above.")
